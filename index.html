@@ -206,16 +206,20 @@
   		font-size: 13px;
 	}
 	#search-box {
-  		position: relative;
-  		top: 200px;
-  		left: 10px;
-  		z-index: 1000;
+  		position: static; /* ✅ biar ikut flow sidebar */
   		background: rgba(255, 255, 255, 0.7);
   		padding: 8px;
   		border-radius: 5px;
   		font-family: Arial, sans-serif;
   		font-size: 13px;
   		box-shadow: 0 0 5px rgba(0,0,0,0.1);
+	}
+	#tool-content > div {
+  		margin-bottom: 10px;
+	}
+	#tool-content {
+  		display: flex;
+  		flex-direction: column;
 	}
 	#search-box input {
   		margin: 3px 0;
@@ -370,6 +374,7 @@
   			<button onclick="map.zoomIn()">➕ Zoom In</button>
   			<button onclick="map.zoomOut()">➖ Zoom Out</button>
 		</div>
+		<!-- === Cari Based on Alamat dan Koordinat === -->
 		<div id="search-box" style="margin-bottom: 10px;">
     			<label><b>Mode Pencarian:</b></label>
     			<select id="searchType">
@@ -385,17 +390,19 @@
         		<input type="text" id="lngInput" placeholder="Longitude">
         		<button onclick="searchByCoords()">Cari</button>
     		</div>
-		<!-- === Search Bandara Manual === -->
+		<!-- === Cari Bandara Manual based on Nama Bandara === -->
 		<div style="margin-bottom: 10px;">
   			<label><b>Cari Bandara</b></label><br>
   			<input type="text" id="search-bandara-manual" placeholder="Nama Bandara">
   			<button onclick="cariBandara()">🔎 Cari</button>
 		</div>
+		<!-- === Tombol untuk alat ukur jarak === -->
 		<div style="margin-bottom: 10px;">
   			<label><b>Alat Ukur</b></label><br>
   			<button id="toggle-measure">🔍 Aktifkan Ukur</button>
 		</div>
 		<div style="margin-top: 15px;">
+		<!-- === Tambah Data link ke Google Form === -->
   		<label><b>Tambah Data Baru</b></label><br>
   			<button style="background: #004ba8; 
 				color: white; 
