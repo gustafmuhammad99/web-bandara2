@@ -271,7 +271,7 @@
 	/* ==== RESPONSIVE BREAKPOINTS ==== */
 	@media screen and (max-width: 768px) {
   	#sidebar-tools {
-    		padding-top: 120px; /* biar gak ketiban logo di HP */
+    		padding-top: 140px; /* biar gak ketiban logo di HP */
   		}
 	}
 
@@ -308,8 +308,10 @@
     		box-sizing: border-box;
  	}
   	#sidebar-tools {
-    		padding-top: 140px; /* lebih lega di layar kecil */
-  		}
+    		padding-top: 20px; /* lebih lega di layar kecil */
+  		max-height: 100vh;
+		overflow-y: auto;
+	}
 	body {
   		overflow-x: hidden;
 	}
