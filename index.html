@@ -30,15 +30,6 @@
     	    width: auto;
 	}
 
-	.leaflet-popup-content img {
-	    display: block;
-    	    margin: 10px auto;
-    	    max-width: 100% !important;
-    	    height: auto;
-    	    border: 1px solid #ccc;
-     	    box-shadow: 0 0 3px rgba(0,0,0,0.3);
-	}
-
 	/* Logo pojok kanan atas */
 	#logo-kemenhub {
     		position: absolute;
@@ -241,22 +232,24 @@
   		bottom: 30px;
   		right: 10px;
   		z-index: 1000;
-  		background: white;
-  		padding: 8px;
-  		border-radius: 5px;
+  		background: #fff;
+		border-left: 6px solid #004ba8;
+  		padding: 10px;
+  		border-radius: 8px;
   		font-size: 13px;
-  		box-shadow: 0 0 5px rgba(0,0,0,0.2);
+  		box-shadow: 0 0 12px rgba(0,0,0,0.2);
   		font-family: Arial, sans-serif;
+		max-width: 240px;
 	}
 
 	#legend-box button {
-  		background: none;
+  		background-color: #004ba8;
+  		color: white;
+  		padding: 6px 10px;
   		border: none;
-  		font-weight: bold;
-  		color: #004ba8;
+  		border-radius: 4px;
   		cursor: pointer;
-  		padding: 0;
-  		margin-bottom: 5px;
+	  	font-weight: bold;
 	}
 
 	#legend-box i {
@@ -271,6 +264,12 @@
     		top: 85px !important; /* ⬅️ ini jarak dari atas halaman, atur sesuai tinggi logo */
     		left: 10px !important;
     		z-index: 1001;
+	}
+	/* Tambahan buat ikon Font Awesome "ruler" */
+	.leaflet-control-measure-toggle::before {
+    		content: "\f545"; /* kode unicode icon ruler combined */
+    		font-family: "Font Awesome 5 Free";
+    		font-weight: 900;
 	}
 	/* ==== RESPONSIVE BREAKPOINTS ==== */
 	@media screen and (max-width: 768px) {
@@ -319,6 +318,30 @@
 	body {
   		overflow-x: hidden;
 	}
+	#custom-zoom-control {
+  		position: absolute;
+  		bottom: 120px; /* di atas legenda, adjust sesuai tinggi */
+  		left: 10px;
+  		z-index: 1001;
+  		display: flex;
+  		flex-direction: column;
+  		gap: 5px;
+	}
+
+	#custom-zoom-control button {
+ 		background: rgba(0, 75, 168, 0.9);
+  		color: white;
+  		border: none;
+  		padding: 8px;
+  		border-radius: 4px;
+  		font-size: 18px;
+  		cursor: pointer;
+  		box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+	}
+
+	#custom-zoom-control button:hover {
+  		background: #003f7d;
+	}
         </style>
         <title></title>
     </head>
@@ -347,6 +370,11 @@
     		<div><i style="background: rgba(43,131,186,1.0); width:12px; height:12px; display:inline-block; margin-right:6px;"></i> Default</div>
   		</div>
 	</div>
+	<!-- === Zoom Control Manual === -->
+	<div id="custom-zoom-control">
+  		<button onclick="map.zoomIn()">➕</button>
+  		<button onclick="map.zoomOut()">➖</button>
+	</div>
 	<div id="toggle-tools-btn">
     		<i class="fa fa-bars"></i>
 	</div>
@@ -367,12 +395,6 @@
     			<option value="Kep. Maluku">Kep. Maluku</option>
     			<option value="Papua">Papua</option>
   			</select>
-		</div>
-		<!-- === Zoom Control Manual === -->
-		<div style="margin-bottom: 10px;">
-  			<label><b>Zoom</b></label><br>
-  			<button onclick="map.zoomIn()">➕ Zoom In</button>
-  			<button onclick="map.zoomOut()">➖ Zoom Out</button>
 		</div>
 		<!-- === Cari Based on Alamat dan Koordinat === -->
 		<div id="search-box" style="margin-bottom: 10px;">
@@ -801,8 +823,17 @@
 	}
 	function toggleLegend() {
   		const box = document.getElementById("legend-content");
-  		box.style.display = box.style.display === "none" ? "block" : "none";
+  		const zoomControl = document.getElementById("custom-zoom-control");
+
+  		if (box.style.display === "none") {
+    		box.style.display = "block";
+    		zoomControl.style.bottom = "220px"; // naik biar gak ketiban legend
+  		} else {
+    		box.style.display = "none";
+    		zoomControl.style.bottom = "120px"; // balik ke posisi semula
+  		}
 	}
+
 	map.createPane('pane_Data_Bandara__1');
         map.getPane('pane_Data_Bandara__1').style.zIndex = 401;
         map.getPane('pane_Data_Bandara__1').style['mix-blend-mode'] = 'normal';
@@ -959,14 +990,23 @@
         if (!isMeasuring) {
             measureControl.addTo(map);          // Tambah ke map
             measureControl._expand();           // Tampilkan panel
-            this.textContent = "❌ Nonaktifkan Ukur";
-        } else {
-            measureControl._collapse();         // Tutup panel
-            map.removeControl(measureControl);  // Hapus dari map
-            this.textContent = "🔍 Aktifkan Ukur";
-        }
-        isMeasuring = !isMeasuring;
-    });
+            // Ganti tombol Leaflet bawaan jadi ikon ruler
+        setTimeout(() => {
+            const toggleBtn = document.querySelector('.leaflet-control-measure-toggle');
+            if (toggleBtn) {
+                toggleBtn.innerHTML = '<i class="fas fa-ruler"></i>'; // kosongin teks default
+                toggleBtn.classList.add('fas', 'fa-ruler'); // pakai ikon FA
+            }
+        }, 10); // kasih delay dikit biar DOM siap
+
+        this.textContent = "❌ Nonaktifkan Ukur";
+    } else {
+        measureControl._collapse();         // Tutup panel
+        map.removeControl(measureControl);  // Hapus dari map
+        this.textContent = "🔍 Aktifkan Ukur";
+    }
+    isMeasuring = !isMeasuring;
+});
         </script>
     </body>
 </html>
